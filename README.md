@@ -68,7 +68,7 @@ $mailBoxes = $imap->getMailBoxes($pattern);
 $pattern: (optional) This is either \* or % where :
 
 
-* Means the library should fetch all the mailboxes including top level mail boxes and sub folders
+\* Means the library should fetch all the mailboxes including top level mail boxes and sub folders
 
 
 **%**  Means the library should fetch all sub folders in the current mailbox 
