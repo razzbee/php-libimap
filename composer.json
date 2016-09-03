@@ -16,7 +16,7 @@
                     "PHPLibImap\\" : "src/PHPLibImap"
       }
   },
-    "license": "Apache License 2",
+    "license": "Apache-2.0",
     "authors": [
         {
             "name": "Razak Zakari",
