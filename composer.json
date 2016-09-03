@@ -25,4 +25,5 @@
         }
     ],
     
+    "minimum-stability": "stable"
 }
