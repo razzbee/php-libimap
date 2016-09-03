@@ -1,5 +1,5 @@
-# PHP-LIBIMAP
-PHP LIBIMAP is a PHP imap library in pure OOP, the idea is to make the native php_imap functions easier to use with performance tunning in mind.
+# PHP-LibImap
+PHP libimap is a PHP imap library in pure OOP, the idea is to make the native php_imap functions easier to use with performance tunning in mind.
 
 
 
