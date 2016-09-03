@@ -8,16 +8,15 @@ using composer , run :
 composer require razzbee/PHP-LIBIMAP
 
 
-
 ###Usage 
 
-//initialise class
+Initialise class
 
 ```php
 $imap = new \PHPLibImap\IMAP;
 ```
 
-// connect an imap server
+**connect an imap server**
 
 
 ```php
@@ -31,22 +30,22 @@ $imap->connectServer([
 ]);
 ```
 
-#####host : Your Imap mail server hostname , example : localhost , 19.10.10.2 , imap.domain.tld or domain.tld 
+**host** : Your Imap mail server hostname , example : localhost , 19.10.10.2 , imap.domain.tld or domain.tld 
 
 
-#####port : your mailserver's imap's port , the default for secure connection is 993 and no secure connection is 143
+**port** : your mailserver's imap's port , the default for secure connection is 993 and no secure connection is 143
 
 
-#####imap_username : The full qualified email address of mail account , example: you@example.com 
+**imap_username** : The full qualified email address of mail account , example: you@example.com 
 
 
-#####password : your mail account password.
+**password** : your mail account password.
 
 
-#####mailbox_name : (optional) , the mailbox to open on an initial connection, if non is specified, INBOX will be used.
+**mailbox_name** : (optional) , the mailbox to open on an initial connection, if non is specified, INBOX will be used.
 
 
-#####enableSSL : (optional) , This is for those using a custom port, so that the library will know if the port needs a secure connection 
+**enableSSL** : (optional) , This is for those using a custom port, so that the library will know if the port needs a secure connection 
 
 
 
@@ -66,10 +65,10 @@ You can also list available mail boxes in mailserver
 $mailBoxes = $imap->getMailBoxes($pattern);
 ```
 
-$pattern: (optional) This is either * or % where :
+$pattern: (optional) This is either \* or % where :
 
 
-* Means the library should fetch all the mailboxes including top level mail boxes and sub folders
+**\*** Means the library should fetch all the mailboxes including top level mail boxes and sub folders
 
 
 **%**  Means the library should fetch all sub folders in the current mailbox 
@@ -86,17 +85,16 @@ read more here : http://php.net/manual/en/function.imap-getmailboxes.php
 $mailBoxInfo = $imap->getMailBoxInfo($forceNew=false);
 ```
 
-$forceNew : (optional) The mailbox info is always prefetched and kept, but if you want a fresh copy of the info to be refetched , set this to true ..
+**$forceNew** : (optional) The mailbox info is always prefetched and kept, but if you want a fresh copy of the info to be refetched , set this to true ..
 
 
-Count TotalMessages in a mailbox 
-$totalMessages = $imap->getTotalMessages();
 
-Count Total Recent Messages 
+***Count Total Recent Messages**
+```php
 $totalRecent = $imap->getMailBoxInfo()->recent;
+```
 
-
-Count Total Unread Messages In the MailBox 
+###Count Total Unread Messages In the MailBox 
 
 ```php
 $totalMsgNo = $imap->getTotalMessages();
