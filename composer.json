@@ -1,5 +1,5 @@
 {
-    "name": "razzbee/PHP-LIBIMAP",
+    "name": "razzbee/phplibimap",
     "description": "A PHP IMAP library in Pure OOP for ease and simplicity",
     "type": "library",
     "version": "1.0",
