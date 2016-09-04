@@ -2,7 +2,7 @@
     "name": "razzbee/php-libimap",
     "description": "A PHP IMAP library in Pure OOP for ease and simplicity",
     "type": "library",
-    "version": "1.0.0",
+    "version": "1.0.1-stable",
     "keywords": [
       "php","php libimap", "php imap", "php-imap", "PHP Imap Library","Mail","PHP Imap mail","Imap Client"
     ],
@@ -24,5 +24,9 @@
         }
     ],
     
+<<<<<<< HEAD
     "minimum-stability": "stable",
+=======
+    "minimum-stability": "stable"
+>>>>>>> origin/master
 }
