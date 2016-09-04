@@ -22,6 +22,7 @@
             "email": "razzsense@gmail.com",
             "website": "https://gh.linkedin.com/in/razzbee"
         }
-    ]
+    ],
     
+    "minimum-stability": "stable"
 }
