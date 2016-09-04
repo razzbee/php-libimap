@@ -24,9 +24,5 @@
         }
     ],
     
-<<<<<<< HEAD
     "minimum-stability": "stable",
-=======
-    "minimum-stability": "stable"
->>>>>>> origin/master
 }
