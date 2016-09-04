@@ -1,6 +1,7 @@
 {
     "name": "razzbee/php-libimap",
     "description": "A PHP IMAP library in Pure OOP for ease and simplicity",
+    "homepage": "https://github.com/razzbee/php-libimap",
     "type": "library",
     "keywords": [
       "php","php libimap", "php imap", "php-imap", "PHP Imap Library","Mail","PHP Imap mail","Imap Client"
