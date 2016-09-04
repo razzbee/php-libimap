@@ -5,7 +5,7 @@ php-libimap is a PHP imap library in pure OOP, the idea is to make the native ph
 
 ###Installation
 using composer , run :
-composer require razzbee/PHP-LIBIMAP
+composer require razzbee/php-libimap
 
 
 ###Usage 
