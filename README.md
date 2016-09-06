@@ -148,3 +148,20 @@ $mails = $imap->fetchMailBoxItems("mailbox_name")
 			  ->getResults();
 ```
 ***limit($limit,$offset=0)*** : The limit method accepts two arguments the limit and offset ,internally , the limits and offsets are been calculated automatically to ranges , this method is safer to use if you have no idea about the range values or number of data in the mailbox. The offset is optional and defaults to 0
+
+####Move Mail Between Mailboxes 
+
+This method moves email message between mailboxes or folder, on success true is returned else false,an exception will also occur on error ..
+
+```php
+$move = $imap->moveMail($mails_uids_array,$source_mailbox,$destination_mailbox,$expunge=false);
+```
+
+***$mails_uids_array*** : The mail(s) numeric uid in an array , it can contain 1 or more valid ids 
+
+***$source_mailbox*** : The name of the mailbox where the mail is currently located at , example : INBOX , Drafts ...
+
+***$destination_mailbox*** : The Name of the new mail box you want to move the mail into , Example : Spam, drafts ....
+
+***$expunge*** : Optional boolean which tells the library to perform immediate clean up or deletion of the email at the source mailbox after moving 
+
