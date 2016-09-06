@@ -76,6 +76,37 @@ class IMAP
    /**Holds output data for  data which requires to return data after proccessing but do to method chaining its not possible **/
    private $outputData;
 
+
+   /**
+    * generate connection string , The connection string is widely used in the libary because , any reference to the mailbox uses the connection string as the mailbox
+    * @param   $mailboxName The Mailbox Name we want to generate the connection string for 
+    * @return   A string of the connection string
+    **/
+   private function generateConnString($mailBoxName=null)
+   {
+        //if mailbox is empty , lets us eexisting one 
+        if(empty($mailBoxName)){
+            $mailBoxName = $this->mailbox_name;
+        }
+    
+    //connString
+    $connString = '{'.$this->host.':'.$this->port.'/imap'.$this->noValidateSSL.'}'.$mailBoxName;
+
+    return $connString;
+   }//end method 
+
+
+   /**
+    * formateMailBoxName
+    * This is an alias of generateConnString, just that it will look wiered when we use it in certain places 
+    * @param   $mailboxName The Mailbox Name we want to generate the connection string for 
+    * @return   A string of the connection string
+    **/
+   private function formatMailBoxName($mailBoxName=null)
+   {
+    return $this->generateConnString($mailBoxName);
+   }//end method 
+
     /**
      * Connect Server 
      * This method connects the imap server 
@@ -118,7 +149,7 @@ class IMAP
         }//end if 
         
         //lets now create our connection strin
-        $this->connString = '{'.$this->host.':'.$this->port.'/imap'.$this->noValidateSSL.'}'.$this->mailBoxName;
+        $this->connString = $this->generateConnString($this->mailBoxName);
         
         try{
             //connect to Imap Server 
@@ -222,7 +253,7 @@ class IMAP
         $this->mailBoxName = !empty($mailBoxName) ? $mailBoxName : $this->mailBoxName;
 
         //lets now create our connection strin
-        $this->connString = '{'.$this->host.':'.$this->port.'/imap'.$this->noValidateSSL.'}'.$this->mailBoxName;
+        $this->connString = $this->generateConnString($this->mailBoxName);
         
         try{
 
@@ -336,8 +367,12 @@ class IMAP
 
         //lets check if the mainbox has data , if no data, we will send an empty array 
         if($totalMsgs == 0){
+
+             //lets set the results to empty array 
+            $this->setResult([]);
+
             //return empty array 
-            return [];
+            return $this;
         }//end 
             
         //both select and range cannot be used together or our script will go kukuu..confused,user must state it 
@@ -391,7 +426,7 @@ class IMAP
             return $this;
         }else{
             throw new Exception("fetchMailBoxItems Error : ".imap_last_error());
-        }
+        }//end if 
         
         }//end fetch mailboxitems
 
@@ -601,18 +636,102 @@ class IMAP
 
 
     /**
-    *Destructor, Its will close the imap connection
+     * Expunge - Deletes all the messages marked for deletion aafter running moveMail , deleteMail 
+     * @return $this 
+     **/
+    public function expunge()
+    {
+        //check if there is an active con 
+        $this->checkConn();
+
+        //run method 
+        $expunge =  imap_expunge($this->imapConn);
+        
+        return $this;
+    }//end method 
+
+
+    /**
+     * MoveMail - Move mail from one mailbox to another 
+     * @param   $mailId array of mail UID , Note We only accept mail UID and not MSG ID 
+     * @param   $sourceMailBoxName The Current MailBox / source mailbox will the message is moved from
+     * @param   $destinationMailBoxName - The Destination or new mail box name the email will be moved to.. Example : Spam , Trash
+     * @param   $expunge  an optional argument which will run the expunge() method to delete the mail at the source folder since it will be mared for removal after the mail move 
+     * @return $this
+     **/
+    public function moveMail($mailsIdArray,$sourceMailBox,$destinationMailBoxName,$expunge=false)
+    {
+        
+        //if the source mailbox is same as the current(destination),jus return true 
+        if($sourceMailBox == $destinationMailBoxName){
+            return true;
+        }//end if 
+
+        //check if there is an active con 
+        $this->checkConn();
+
+        //switch mail box 
+        $this->switchMailBox($sourceMailBox);
+
+        //do start proccessing 
+        foreach($mailsIdArray AS $key => $mailId){
+            
+            //(int) $mailId
+            $mailId = (int) $mailId;
+
+            //if not int and bigger than 0, lets send an exception 
+            if(!is_integer($mailId) || $mailId <= 0){
+                throw new Exception("Inavlid mail uid at index $key");
+                die();
+            }//end method 
+        }//end loop 
+        
+        //messages uid 
+        $mailUID = implode(",",$mailsIdArray);
+
+
+        //mail move 
+        $moveMail = imap_mail_move($this->imapConn,$mailUID,$destinationMailBoxName,CP_UID);
+        
+
+        //if errors lets keep the after we will send it to the user
+        if(!$moveMail){
+           throw new Exception("Mail Failed to Move : ".imap_last_error());
+        }//end if 
+        
+
+        //if expunge is true then lets run it 
+        if($expunge == true){
+          $this->expunge();
+        }//end if 
+
+        //return instance of class 
+        return true;
+    }//end method 
+
+    
+    /**
+     * Close Imap Connection 
+     **/
+    public function close()
+    {
+          //if connection exists close it 
+        if(!empty($this->imapConn)){
+            imap_close($this->imapConn);
+        }//end close imap connection 
+
+    }//end close connection
+
+    /**
+    *Destructor, Its will auto close the imap connection if not manually closed 
     *@param none
     * @return   void
      */
     public function __destruct()
     {
-
-        //if connection exists close it 
-        if(!empty($this->imapConn)){
-            imap_close($this->imapConn);
-        }//end close imap connection 
-
+     //close the connection 
+     $this->close();
     }//end 
+
 
 }//end imap class 
