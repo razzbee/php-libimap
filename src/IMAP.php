@@ -153,7 +153,7 @@ class IMAP
         
         try{
             //connect to Imap Server 
-            $this->imapConn = imap_open($this->connString,$this->imapUsername,$this->imapPassword,null,$this->connRetries);
+            $this->imapConn = imap_open($this->connString,$this->imapUsername,$this->imapPassword,OP_SHORTCACHE,$this->connRetries);
 
             //return instance 
             return $this;
@@ -253,23 +253,22 @@ class IMAP
         $this->mailBoxName = !empty($mailBoxName) ? $mailBoxName : $this->mailBoxName;
 
         //lets now create our connection strin
-        $this->connString = $this->generateConnString($this->mailBoxName);
+       $this->connString = $this->generateConnString($this->mailBoxName);
         
-        try{
+        //connect to Imap Server 
+        $connServer =  imap_reopen($this->imapConn,$this->connString);
+              
 
-            //connect to Imap Server 
-            $this->imapConn = imap_reopen($this->connString,$this->imapUsername,$this->imapPassword);
-
-            //return instance 
-            return $this;
-        }catch(Exception $e){
-
+        if(!$connServer){
             //if error throw an error too 
-            throw new Exception("Imap reConnection to Imap Server Failed"."-".var_dump(imap_errors()));
+            throw new Exception("Imap reConnection to Imap Server Failed"."-".imap_last_error());
             
             //kill proccessing 
             die();
-        }
+        }//end if connection fails
+
+        //return instance 
+         return $this;
     }//end reconnect server 
 
 
