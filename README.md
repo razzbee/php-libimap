@@ -93,7 +93,7 @@ $mailBoxInfo = $imap->getMailBoxInfo($mailboxName=null,$forceNew=false);
 
 
 
-***Count Total Recent Messages**
+***Count Total Recent Messages***
 ```php
 $totalRecent = $imap->getMailBoxInfo()->recent;
 ```
@@ -167,3 +167,12 @@ $move = $imap->moveMail($mails_uids_array,$source_mailbox,$destination_mailbox,$
 
 ***$expunge*** : Optional boolean which tells the library to perform immediate clean up or deletion of the email at the source mailbox after moving 
 
+###Mark as Mail as seen , answered , deleted , draft or flagged
+```php 
+$setFlag = $imap->setFlag($mails_uids_array,$flag,$mailBoxName);
+```
+***$mails_uids_array*** : The mail(s) numeric uid in an array , it can contain 1 or more valid ids 
+
+***$flag***:  The flag to set to ,valid flags : seen , answered, deleted , draft or flagged 
+
+***$mailBoxName*** : Mailbox name of the mails you want to set the flags to  if not provided , current opened mailbox will be used 
