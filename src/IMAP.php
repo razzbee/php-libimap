@@ -295,16 +295,25 @@ class IMAP
 
 
     /**
-     * getMailBoxInfo - This uses imap_check() to get the current mailbox info 
-     * @param  none
-     * @return  void
+     * getMailBoxInfo - Fetch Information about a mailbox
+     * @param  $mailBoxName The mailbox_name you want to retrieve it information
+     * @param $forceNew Wethere to force fetch a fresh copy of info
+     * @return  object containing mail info 
      **/
-    public function getMailBoxInfo($forceNew=false,$options=SA_ALL)
-    {
+    public function getMailBoxInfo($mailBoxName=null,$forceNew=false)
+    {  
+        if(empty($mailBoxName)){
+
+            //if the mail box is empty , use the current mailbox 
+            $mailBoxName = $this->mailBoxName;
+        }else{
+            //if the mailbox name was supplied , lets switch mailbox 
+            $this->switchMailBox($mailBoxName);
+        }//and if 
         
         //lets check if the mailbox info exists already,we will return it
-        if(!empty($this->mailBoxInfo[$this->mailBoxName]) && $forceNew == false){
-            return $this->mailBoxInfo[$this->mailBoxName];
+        if(!empty($this->mailBoxInfo[$mailBoxName]) && $forceNew == false){
+            return $this->mailBoxInfo[$mailBoxName];
         }//end 
 
         $mailboxInfo = imap_status($this->imapConn,$this->connString,SA_ALL);
@@ -316,7 +325,7 @@ class IMAP
             $mailboxInfo->total_messages = $mailboxInfo->messages;
 
             //save it in an obj 
-            $this->mailBoxInfo[$this->mailBoxName] = $mailboxInfo;
+            $this->mailBoxInfo[$mailBoxName] = $mailboxInfo;
 
             return $mailboxInfo;
         }else{
@@ -653,7 +662,7 @@ class IMAP
 
     /**
      * MoveMail - Move mail from one mailbox to another 
-     * @param   $mailId array of mail UID , Note We only accept mail UID and not MSG ID 
+     * @param   $mailsIdArray array of mail UID , Note We only accept mail UID and not MSG ID 
      * @param   $sourceMailBoxName The Current MailBox / source mailbox will the message is moved from
      * @param   $destinationMailBoxName - The Destination or new mail box name the email will be moved to.. Example : Spam , Trash
      * @param   $expunge  an optional argument which will run the expunge() method to delete the mail at the source folder since it will be mared for removal after the mail move 
@@ -709,6 +718,111 @@ class IMAP
         return true;
     }//end method 
 
+
+    /**
+     * setFlag - This sets a flag to a mail , example: seen , answered or flag
+     * @param   $mailsIdArray  Message uids in an array format 
+     * @param   $flag  The flag to set to ,valid flags : seen , answered, deleted , drfat or flagged 
+     * @param   $mailBoxName option mailbox Name to switch to before setting the flag 
+     * @return   True on success or false on failure
+     **/
+    public function setFlag($mailsIdArray,$flag,$mailBoxName=null)
+    {
+
+        //check if there is an active con 
+        $this->checkConn();
+
+        //if the mailBoxName is not empty, lets switch first 
+        if(!empty($mailBoxName)){
+            $this->switchMailBox($mailBoxName);
+        }//ed switch mailbox 
+        
+
+        //flag must not be empty
+        if(!preg_match("/(seen|answered|flagged|deleted|draft)/i",$flag)){
+            throw new Exception("Invalid Flag");
+        }//end if flage is empty 
+
+        //do start proccessing 
+        foreach($mailsIdArray AS $key => $mailId){
+            
+            //(int) $mailId
+            $mailId = (int) $mailId;
+
+            //if not int and bigger than 0, lets send an exception 
+            if(!is_integer($mailId) || $mailId <= 0){
+                throw new Exception("Inavlid mail uid at index $key");
+                die();
+            }//end method 
+        }//end loop 
+        
+        //messages uid 
+        $mailUID = implode(",",$mailsIdArray);
+        
+
+        $flag = ucfirst($flag);
+
+        //proccess request 
+        $status = imap_setflag_full($this->imapConn, $mailUID, "\\$flag",ST_UID);
+    
+        return $status; 
+    }//end method
+
+
+    
+   /**
+     *  clearFlag - This clears a flag set on a mail , example clearing a seen flag will make the mail unseen
+     * @param   $mailsIdArray  Message uids in an array format 
+     * @param   $flag  The flag to set to ,valid flags : seen , answered, deleted , drfat or flagged 
+     * @param   $mailBoxName option mailbox Name to switch to before setting the flag 
+     * @return   True on success or false on failure
+     **/
+    public function clearFlag($mailsIdArray,$flag,$mailBoxName=null)
+    {
+
+        //check if there is an active con 
+        $this->checkConn();
+
+        //if the mailBoxName is not empty, lets switch first 
+        if(!empty($mailBoxName)){
+            $this->switchMailBox($mailBoxName);
+        }//ed switch mailbox 
+        
+
+        //flag must not be empty
+        if(!preg_match("/(seen|answered|flagged|deleted|draft)/i",$flag)){
+            throw new Exception("Invalid Flag");
+        }//end if flage is empty 
+
+        //do start proccessing 
+        foreach($mailsIdArray AS $key => $mailId){
+            
+            //(int) $mailId
+            $mailId = (int) $mailId;
+
+            //if not int and bigger than 0, lets send an exception 
+            if(!is_integer($mailId) || $mailId <= 0){
+                throw new Exception("Inavlid mail uid at index $key");
+                die();
+            }//end method 
+        }//end loop 
+        
+        //messages uid 
+        $mailUID = implode(",",$mailsIdArray);
+        
+
+       $flag = ucfirst($flag);
+
+        //proccess request 
+        $status = imap_clearflag_full($this->imapConn, $mailUID, "\\$flag",ST_UID);
+    
+        //expunge
+        $this->expunge();
+        
+        return $status; 
+    }//end method
+
+    
     
     /**
      * Close Imap Connection 
