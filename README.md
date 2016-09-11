@@ -84,8 +84,10 @@ read more here : http://php.net/manual/en/function.imap-getmailboxes.php
 ###Get Info About a mailbox 
 
 ```php
-$mailBoxInfo = $imap->getMailBoxInfo($forceNew=false);
+$mailBoxInfo = $imap->getMailBoxInfo($mailboxName=null,$forceNew=false);
 ```
+
+**$mailBoxName**: (optional) the name of the mailbox you want the info about, it defaults to the current opened mailbox if not set
 
 **$forceNew** : (optional) The mailbox info is always prefetched and kept, but if you want a fresh copy of the info to be refetched , set this to true ..
 
