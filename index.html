@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Php-libimap by razzbee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Php-libimap</h1>
+      <h2 class="project-tagline">PHP libimap is a PHP imap library in pure OOP, the idea is to make the native php_imap functions easier to use with performance tunning in mind.</h2>
+      <a href="https://github.com/razzbee/php-libimap" class="btn">View on GitHub</a>
+      <a href="https://github.com/razzbee/php-libimap/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/razzbee/php-libimap/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="php-libimap" class="anchor" href="#php-libimap" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>php-libimap</h1>
+
+<p>php-libimap is a PHP imap library in pure OOP, the idea is to make the native php_imap functions easier to use with performance tunning in mind.</p>
+
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installation</h3>
+
+<p>using composer , include this in your <strong><em>composer.json</em></strong> file :</p>
+
+<div class="highlight highlight-source-json"><pre><span class="pl-s"><span class="pl-pds">"</span>razzbee/php-libimap<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>dev-master<span class="pl-pds">"</span></span></pre></div>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<h4>
+<a id="initialise-class" class="anchor" href="#initialise-class" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initialise class</h4>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$imap</span> <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-c1">\PHPLibImap\</span><span class="pl-c1">IMAP</span>;</span></pre></div>
+
+<p><strong>connect an imap server</strong></p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>connectServer([</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>host<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>localhost<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>port<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">993</span>,</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>imap_username<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>username@domain.tld<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>password<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>secret<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>mailbox_name<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-s"><span class="pl-pds">'</span>INBOX<span class="pl-pds">'</span></span>,</span>
+<span class="pl-s1">   <span class="pl-s"><span class="pl-pds">'</span>enableSSL<span class="pl-pds">'</span></span> <span class="pl-k">=&gt;</span> <span class="pl-c1">true</span>,</span>
+<span class="pl-s1">]);</span></pre></div>
+
+<p><strong>host</strong> : Your Imap mail server hostname , example : localhost , 19.10.10.2 , imap.domain.tld or domain.tld </p>
+
+<p><strong>port</strong> : your mailserver's imap's port , the default for secure connection is 993 and no secure connection is 143</p>
+
+<p><strong>imap_username</strong> : The full qualified email address of mail account , example: <a href="mailto:you@example.com">you@example.com</a> </p>
+
+<p><strong>password</strong> : your mail account password.</p>
+
+<p><strong>mailbox_name</strong> : (optional) , the mailbox to open on an initial connection, if non is specified, INBOX will be used.</p>
+
+<p><strong>enableSSL</strong> : (optional) , This is for those using a custom port, so that the library will know if the port needs a secure connection </p>
+
+<h3>
+<a id="switching-mailbox" class="anchor" href="#switching-mailbox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Switching Mailbox</h3>
+
+<p>After Connecting to the server, the optional mailbox_name  supplied in the connection parameters is opened automatically , you can change or switch mailbox using </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span> switchMailBox(<span class="pl-s"><span class="pl-pds">'</span>mailbox_name<span class="pl-pds">'</span></span>);</span></pre></div>
+
+<p>the mailbox_name must be one of the names of the mailfolders or boxes in your mailserver , example: INBOX , Drafts , Spam  or Trash </p>
+
+<h3>
+<a id="fetch-mailboxes-mail-folders" class="anchor" href="#fetch-mailboxes-mail-folders" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fetch MailBoxes (Mail Folders)</h3>
+
+<p>You can also list available mail boxes in mailserver </p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$mailBoxes</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>getMailBoxes(<span class="pl-smi">$pattern</span>);</span></pre></div>
+
+<p>$pattern: (optional) This is either * or % where :</p>
+
+<p>* Means the library should fetch all the mailboxes including top level mail boxes and sub folders</p>
+
+<p><strong>%</strong>  Means the library should fetch all sub folders in the current mailbox </p>
+
+<p>read more here : <a href="http://php.net/manual/en/function.imap-getmailboxes.php">http://php.net/manual/en/function.imap-getmailboxes.php</a></p>
+
+<h3>
+<a id="get-info-about-a-mailbox" class="anchor" href="#get-info-about-a-mailbox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Get Info About a mailbox</h3>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$mailBoxInfo</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>getMailBoxInfo(<span class="pl-smi">$mailboxName</span><span class="pl-k">=</span><span class="pl-c1">null</span>,<span class="pl-smi">$forceNew</span><span class="pl-k">=</span><span class="pl-c1">false</span>);</span></pre></div>
+
+<p><strong>$mailBoxName</strong>: (optional) the name of the mailbox you want the info about, it defaults to the current opened mailbox if not set</p>
+
+<p><strong>$forceNew</strong> : (optional) The mailbox info is always prefetched and kept, but if you want a fresh copy of the info to be refetched , set this to true ..</p>
+
+<p><strong><em>Count Total Recent Messages</em></strong></p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$totalRecent</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>getMailBoxInfo()<span class="pl-k">-&gt;</span><span class="pl-smi">recent</span>;</span></pre></div>
+
+<h3>
+<a id="count-total-unread-messages-in-the-mailbox" class="anchor" href="#count-total-unread-messages-in-the-mailbox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Count Total Unread Messages In the MailBox</h3>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$totalMsgNo</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>getTotalMessages();</span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-c">//or</span></span>
+<span class="pl-s1"></span>
+<span class="pl-s1"><span class="pl-smi">$totalMsgNo</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>getMailBoxInfo()<span class="pl-k">-&gt;</span><span class="pl-smi">messages</span>;</span></pre></div>
+
+<h3>
+<a id="fetch-mails-from-a-mailbox" class="anchor" href="#fetch-mails-from-a-mailbox" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fetch Mails From a MailBox</h3>
+
+<p>This library has many ways to fetch mails from a mailbox , we have also optimized this particular feature for speed and performance ..</p>
+
+<h4>
+<a id="fetch-mailbox-items-overview-by-uid" class="anchor" href="#fetch-mailbox-items-overview-by-uid" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fetch MailBox Items overview By UID</h4>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$mails</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>fetchMailBoxItems(<span class="pl-s"><span class="pl-pds">"</span>mailbox_name<span class="pl-pds">"</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>select(<span class="pl-c1">uid1</span>,<span class="pl-c1">uid2</span>,<span class="pl-c1">uid3</span>,<span class="pl-c1">uid4</span><span class="pl-k">...</span><span class="pl-c1">uidN</span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>getResults();</span></pre></div>
+
+<p><strong>mailbox_name</strong> : optional mailbox name , if none is supplied, the current opened mailboxed will be used </p>
+
+<p><strong>select(uid1,uid2, ... )</strong>: Select mail headers by the uid or the integer id(s) of the mail(s) , you must provide a valid uid else an exception will be generated </p>
+
+<p><strong>getResults</strong> : Generate  and get the results </p>
+
+<h4>
+<a id="fetch-mail-overview-using-range" class="anchor" href="#fetch-mail-overview-using-range" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fetch Mail Overview using range</h4>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$mails</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>fetchMailBoxItems(<span class="pl-s"><span class="pl-pds">"</span>mailbox_name<span class="pl-pds">"</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>range(<span class="pl-c1">1</span>,<span class="pl-c1">10</span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>orderById(<span class="pl-s"><span class="pl-pds">'</span>desc<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>getResults();</span></pre></div>
+
+<p><strong>range(arg1,arg2)</strong> : The range of mail uid , the above example will pull mailbox item overview info of uid 1 to 10 , This method assumes you already know your range already..</p>
+
+<p><strong>orderById</strong> : Order the results by the uid , the default is DESC (Descending Order), this means the latest mails overview info will be shown first</p>
+
+<h4>
+<a id="fetch-mail-overview-using-limit-and-offset" class="anchor" href="#fetch-mail-overview-using-limit-and-offset" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Fetch Mail Overview using limit and Offset</h4>
+
+<p>Like mysql limit and offset , this library supports the limit and offset using the limit($limit,$offset) method..</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$mails</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>fetchMailBoxItems(<span class="pl-s"><span class="pl-pds">"</span>mailbox_name<span class="pl-pds">"</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>limit(<span class="pl-c1">1</span>,<span class="pl-c1">10</span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>orderById(<span class="pl-s"><span class="pl-pds">'</span>desc<span class="pl-pds">'</span></span>)</span>
+<span class="pl-s1">              <span class="pl-k">-&gt;</span>getResults();</span></pre></div>
+
+<p><strong><em>limit($limit,$offset=0)</em></strong> : The limit method accepts two arguments the limit and offset ,internally , the limits and offsets are been calculated automatically to ranges , this method is safer to use if you have no idea about the range values or number of data in the mailbox. The offset is optional and defaults to 0</p>
+
+<h4>
+<a id="move-mail-between-mailboxes" class="anchor" href="#move-mail-between-mailboxes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Move Mail Between Mailboxes</h4>
+
+<p>This method moves email message between mailboxes or folder, on success true is returned else false,an exception will also occur on error ..</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$move</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>moveMail(<span class="pl-smi">$mails_uids_array</span>,<span class="pl-smi">$source_mailbox</span>,<span class="pl-smi">$destination_mailbox</span>,<span class="pl-smi">$expunge</span><span class="pl-k">=</span><span class="pl-c1">false</span>);</span></pre></div>
+
+<p><strong><em>$mails_uids_array</em></strong> : The mail(s) numeric uid in an array , it can contain 1 or more valid ids </p>
+
+<p><strong><em>$source_mailbox</em></strong> : The name of the mailbox where the mail is currently located at , example : INBOX , Drafts ...</p>
+
+<p><strong><em>$destination_mailbox</em></strong> : The Name of the new mail box you want to move the mail into , Example : Spam, drafts ....</p>
+
+<p><strong><em>$expunge</em></strong> : Optional boolean which tells the library to perform immediate clean up or deletion of the email at the source mailbox after moving </p>
+
+<h3>
+<a id="mark-as-mail-as-seen--answered--deleted--draft-or-flagged" class="anchor" href="#mark-as-mail-as-seen--answered--deleted--draft-or-flagged" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Mark as Mail as seen , answered , deleted , draft or flagged</h3>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1"><span class="pl-smi">$setFlag</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span><span class="pl-k">-&gt;</span>setFlag(<span class="pl-smi">$mails_uids_array</span>,<span class="pl-smi">$flag</span>,<span class="pl-smi">$mailBoxName</span>);</span></pre></div>
+
+<p><strong><em>$mails_uids_array</em></strong> : The mail(s) numeric uid in an array , it can contain 1 or more valid ids </p>
+
+<p><strong><em>$flag</em></strong>:  The flag to set to ,valid flags : seen , answered, deleted , draft or flagged </p>
+
+<p><strong><em>$mailBoxName</em></strong> : Mailbox name of the mails you want to set the flags to  if not provided , current opened mailbox will be used </p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/razzbee/php-libimap">Php-libimap</a> is maintained by <a href="https://github.com/razzbee">razzbee</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
