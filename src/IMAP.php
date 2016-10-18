@@ -393,6 +393,7 @@ class IMAP
 
 
         //lets check if we have data range or user specified uids to select 
+        //if select
         if(!empty($this->mailBoxSelectItems)){
            
             //lets get the sequences 
@@ -415,6 +416,8 @@ class IMAP
         
         //prepare sequence
         $fetchSequence = implode($implodeDelimiter,$fetchSequenceArray);
+
+       // dd( $fetchSequence );
 
         //lets now fetch the mail data 
         $mailBoxItems =  imap_fetch_overview($this->imapConn,$fetchSequence,0);
@@ -821,7 +824,73 @@ class IMAP
         return $status; 
     }//end method
 
+
+    /**
+    *  search - Search into mailbox using a given criterio
+    * @param   $criteriaArry = null , An optional array containing a key value criteria for the search,it defaults back to ALL
+    * @param   $mailBoxName = null optional mailbox Name to switch to before setting the flag 
+    * @return   instance , use the getResults() method to retrive the results
+    **/
+    public function search($criteriaArray=null,$mailBoxName = null){
+
+       
+        //check if there is an active con 
+        $this->checkConn();
+
+        //if the mailBoxName is not empty, lets switch first 
+        if(!empty($mailBoxName)){
+            $this->switchMailBox($mailBoxName);
+        }//ed switch mailbox 
+        
+        
+        //if criteria was not provided , set criteria to ALL
+        if(sizeof($criteriaArray) == 0 || empty($criteriaArray)){
+            $criteria = 'ALL';
+        }else{
+        
+            //lets now add the criteria 
+            $criteria = "";
+
+            foreach($criteriaArray AS $criteriaName => $criteriaValue){
+                
+                $criteriaName = strtoupper($criteriaName);
+
+               if(empty( $criteriaName)){
+               
+                $criteria .= " $criteriaName ";
+              
+               }else{
+                //create the criteria
+                $criteria .="$criteriaName \"$criteriaValue\" ";
+               
+                }//end if 
+
+            }//end foreach loop 
+           
+        //trim
+        $criteria = trim($criteria);
+        }//end if 
     
+
+       //lets now search 
+       //SE_FREE will return message sequence number which we will use in fetching the messages
+       $msgUIDs = imap_search($this->imapConn,$criteria,SE_FREE,"UTF-8");
+        
+       //if false we should send an empty array
+       //fals means no data was gotten 
+       if($msgUIDs == false){
+            return $this->setResults([]);
+       }//end 
+       
+       //lets set mailBoxSelectItems to our results , this is used by ->select() internally during fetching of mailbox items to fetch data by uids
+        $this->mailBoxSelectItems = $msgUIDs;
+
+       $fetchMails = $this->fetchMailBoxItems();
+       
+       //lets return the instance 
+       return $this;
+    }//end search
+
     
     /**
      * Close Imap Connection 
