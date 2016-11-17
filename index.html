@@ -176,6 +176,32 @@
 
 <p><strong><em>$mailBoxName</em></strong> : Mailbox name of the mails you want to set the flags to  if not provided , current opened mailbox will be used </p>
 
+<h4>
+<a id="search-mail" class="anchor" href="#search-mail" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Search Mail</h4>
+
+<p>Search into mailbox using a given criteria , use the getResults() method to retrive the results</p>
+
+<div class="highlight highlight-text-html-php"><pre><span class="pl-s1">        <span class="pl-smi">$keyword</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>hello<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c">//body must contain at least one occurrance of the keyword</span></span>
+<span class="pl-s1">        <span class="pl-smi">$searchCritiria</span>[<span class="pl-s"><span class="pl-pds">'</span>BODY<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-smi">$keyword</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-c">//subject too must contain at least one occurrance of the keyword </span></span>
+<span class="pl-s1">        <span class="pl-smi">$searchCritiria</span>[<span class="pl-s"><span class="pl-pds">'</span>SUBJECT<span class="pl-pds">'</span></span>] <span class="pl-k">=</span> <span class="pl-smi">$keyword</span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-smi">$mailBoxName</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>INBOX<span class="pl-pds">"</span></span>;</span>
+<span class="pl-s1"></span>
+<span class="pl-s1">        <span class="pl-smi">$searchResults</span> <span class="pl-k">=</span> <span class="pl-smi">$imap</span></span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>search(<span class="pl-smi">$searchCritiria</span>,<span class="pl-smi">$mailBoxName</span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>limit(<span class="pl-c1">20</span>)</span>
+<span class="pl-s1">            <span class="pl-k">-&gt;</span>getResults();</span></pre></div>
+
+<p><strong><em>$keyword</em></strong> The string we want to search for </p>
+
+<p><strong><em>$searchCritiria</em></strong> : The search Criteria which will be used for the search , read more about the criteria here : <a href="http://php.net/manual/en/function.imap-search.php">http://php.net/manual/en/function.imap-search.php</a></p>
+
+<p><strong><em>$mailBoxName</em></strong>: Optional Mailbox Name where you want to search into , if the mailbox name is omitted , the current opened mailbox will be used </p>
+
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/razzbee/php-libimap">Php-libimap</a> is maintained by <a href="https://github.com/razzbee">razzbee</a>.</span>
 
