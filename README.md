@@ -176,3 +176,27 @@ $setFlag = $imap->setFlag($mails_uids_array,$flag,$mailBoxName);
 ***$flag***:  The flag to set to ,valid flags : seen , answered, deleted , draft or flagged 
 
 ***$mailBoxName*** : Mailbox name of the mails you want to set the flags to  if not provided , current opened mailbox will be used 
+
+####Search Mail 
+Search into mailbox using a given criteria , use the getResults() method to retrive the results
+```php 
+        $keyword = "hello";
+		 
+        //body must contain at least one occurrance of the keyword
+        $searchCritiria['BODY'] = $keyword;
+		
+        //subject too must contain at least one occurrance of the keyword 
+        $searchCritiria['SUBJECT'] = $keyword;
+		
+		$mailBoxName = "INBOX";
+		
+        $searchResults = $imap
+            ->search($searchCritiria,$mailBoxName)
+            ->limit(20)
+            ->getResults();
+```
+***$keyword*** The string we want to search for 
+***$searchCritiria*** : The search Criteria which will be used for the search , read more about the criteria here : http://php.net/manual/en/function.imap-search.php
+
+***$mailBoxName***: Optional Mailbox Name where you want to search into , if the mailbox name is omitted , the current opened mailbox will be used 
+

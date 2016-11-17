@@ -78,6 +78,43 @@ class IMAP
 
 
    /**
+    * Error Dispacher 
+    * @param   $err Sring|null  Error String 
+    * @return nothing 
+    **/
+   private function dispatchError($err = null)
+   {
+
+        //les ge imap_errors 
+        $imapErrors = imap_errors();
+
+        $lastImapError = imap_last_error();
+
+         $errorStr = "<div><h4>Last Imap Error</h4>/div><div> $lastImapError</div><br>";
+
+        if(!empty($imapErrors ))
+        {
+
+            $errorStr .= "<div><h4>Imap Errors:</h4></div> <div><ol>";
+
+            foreach($imapErrors AS $error)
+            {
+                $errorStr .= "<li>$error</li>";
+            }
+            
+            $errorStr .= "</ol></div>";
+           
+        }
+
+        $errorStr .= "<br><div><h4>Other Errors : </div><br> $err";
+
+        throw new Exception($errorStr);
+
+        die();
+   }//end method
+
+
+   /**
     * generate connection string , The connection string is widely used in the libary because , any reference to the mailbox uses the connection string as the mailbox
     * @param   $mailboxName The Mailbox Name we want to generate the connection string for 
     * @return   A string of the connection string
@@ -160,10 +197,8 @@ class IMAP
         }catch(Exception $e){
 
             //if error throw an error too 
-            throw new Exception("Connection to Imap Server Failed"."-".imap_last_error());
+            $this->dispatchError($e);
             
-            //kill proccessing 
-            die();
         }
         
     }//end method 
@@ -178,8 +213,10 @@ class IMAP
       
         //if connection string is empty, lets send error and kill script 
         if(empty($this->imapConn)){
-            throw new Exception("Imap Server Not Connected, Please Connect Imap Server using this connectServer(param) Method.");
-            die();
+            
+            $e = "Imap Server Not Connected, Please Connect Imap Server using this connectServer(param) Method.";
+            
+             $this->dispatchError($e);
         }//end if 
 
         return true;
@@ -203,7 +240,7 @@ class IMAP
 
         //if not success lets send alert 
         if(!is_array($fetchMailBoxes)){
-            throw new Exception("Failed to fetch mailboxes - ".imap_last_error());
+             $this->dispatchError("Failed to fetch mailboxes");
         }//end if not success 
         
         //sort data 
@@ -236,7 +273,7 @@ class IMAP
         //return the proccessed data 
         return $proccessedData;
     }//end method
-
+     
 
     /**
      * Reconnect Server , This Reconnect the IMAP Server Using existing details 
@@ -261,10 +298,8 @@ class IMAP
 
         if(!$connServer){
             //if error throw an error too 
-            throw new Exception("Imap reConnection to Imap Server Failed"."-".imap_last_error());
-            
-            //kill proccessing 
-            die();
+            $this->dispatchError("Imap reConnection to Imap Server Failed");
+
         }//end if connection fails
 
         //return instance 
@@ -328,7 +363,7 @@ class IMAP
 
             return $mailboxInfo;
         }else{
-            throw new Exception("Failed to fetch mailbox info".imap_last_error());
+            $this->dispatchError("Failed to fetch mailbox info");
         }//end if 
             
 
@@ -387,8 +422,8 @@ class IMAP
         if(sizeof($this->mailBoxSelectItems) > 0 && sizeof($this->mailBoxFetchItemsRange) > 0){
 
              //send error since these two cannot be used together
-             throw new Exception("The methods select and range cannot be used togther, only one can be used.");
-             die();
+             $this->dispatchError("The methods select and range cannot be used togther, only one can be used.");
+     
         }//end if 
 
 
@@ -436,7 +471,7 @@ class IMAP
             //lets return this
             return $this;
         }else{
-            throw new Exception("fetchMailBoxItems Error : ".imap_last_error());
+             $this->dispatchError("fetchMailBoxItems Error");
         }//end if 
         
         }//end fetch mailboxitems
@@ -707,7 +742,7 @@ class IMAP
 
         //if errors lets keep the after we will send it to the user
         if(!$moveMail){
-           throw new Exception("Mail Failed to Move : ".imap_last_error());
+           $this->dispatchError("Mail Failed to Move");
         }//end if 
         
 
@@ -890,6 +925,388 @@ class IMAP
        //lets return the instance 
        return $this;
     }//end search
+    
+
+    /**
+     * getMailTypes - Send mail types array 
+     * @return  array mailtypes 
+     * 
+     **/
+    public static function getMailTypes()
+    {
+        
+        $mailTypes = [
+              
+              TYPETEXT        => "text",
+              TYPEMULTIPART   => "multipart",
+              TYPEMESSAGE     => "message",
+              TYPEAPPLICATION => "application",
+              TYPEAUDIO       => "audio",
+              TYPEIMAGE       => "image",
+              TYPEVIDEO       => "video",
+              TYPEMODEL       => "model",
+              TYPEOTHER       => "other"
+            ];
+
+
+        return  $mailTypes;
+    }//end method 
+
+
+
+    /** 
+     * fetchMessage
+     * Fetching the mail Message 
+     * @param   $message No or UID , Note if the messageNo is UID , provide the FT_UID flag
+     * @return an array of mail message and attachments if some exists
+     */
+    public function fetchMessage($msgNo,$flag=null)
+    {
+        
+        //if message UID i required
+        if(empty($msgNo)){
+            throw new Exception("Message No. is required");
+        }//end if message uid is required
+      
+        
+        //check if there is an active con 
+        $this->checkConn();
+        
+        try{
+          
+
+            //lets now fetch the mesage structure 
+            $mailStructObj = imap_fetchstructure($this->imapConn, $msgNo, $flag);
+            
+           // var_dump($mailStructObj);
+
+            if(empty($mailStructObj))
+            {
+                return [];
+            }
+
+
+
+           $mailAttachments = [];
+
+           $inlineAttachments = [];
+
+           //lets get mail type 
+           $topLevelMailType = $mailStructObj->type;
+
+
+           $proccessedMailData = [];
+            
+
+           //lets fecth message headers 
+           $proccessedMailData["message_headers"] = $this->messageHeaders($msgNo);
+
+           
+
+            //lets check if we have parts 
+            //if there is no parts,then we will proccess the primary part 
+            if(empty($mailStructObj->parts))
+            {   
+                //part n is 0 , php counts from 0
+                $partNo = 0;
+
+                $proccessedMailData["text"] =  $this->parseMailParts($msgNo,$mailStructObj,$partNo);
+            }
+
+            else 
+            {
+
+                foreach($mailStructObj->parts AS $rawPartNo => $mailPartObj)
+                {
+                    
+                    //php counts from 0 , parts starts from 1 
+                    $partNo = $rawPartNo+1;
+
+                    $proccessedMailPart = $this->parseMailParts($msgNo,$mailPartObj,$partNo);
+
+
+                    $mailMime = $proccessedMailPart["mime"];
+
+
+                    //if its attachment
+                    if($proccessedMailPart['disposition'] == 'attachment')
+                    {
+                        $mailAttachments[] = $proccessedMailPart;
+                    }
+
+                    
+                    //inline messages 
+                    elseif($proccessedMailPart['disposition'] == 'inline')
+                    {
+                        $inlineAttachments[] =  $proccessedMailPart;
+                    }
+
+
+                    //not attachment, not inline
+                    else
+                    {
+                        //if multipart, lests send the text and html data only
+                        if($proccessedMailPart['primary_type'] == "multipart")
+                        {
+                            
+                            $mailSubParts = $proccessedMailPart["sub_parts"];
+
+                            //html
+                            $proccessedMailData["html"] = @$mailSubParts["html"];
+
+                            //plain 
+                            $proccessedMailData["plain"] = @$mailSubParts["plain"];
+
+                        }
+
+                        elseif($proccessedMailPart['primary_type'] == "text")
+                        {
+                            
+
+
+                             $proccessedMailData["text"] =  $proccessedMailPart;
+
+                        }//end if multipart or not
+
+                        else
+                        {
+                            $key = (!empty($mailMime)) ? $mailMime : $rawPartNo;
+
+                            $proccessedMailData[$key] =  $proccessedMailPart;   
+                        }
+
+                    }
+
+                }//end foreach loop 
+               
+                  
+            }//end if 
+        
+             
+           //lets now mearge the attachments and others 
+           $proccessedMailData["downloadable_attachments"] = $mailAttachments;
+
+           //inline attachments 
+           $proccessedMailData["inline_attachments"] = $inlineAttachments;
+            
+
+           return $proccessedMailData;
+       }//end try 
+        
+        catch(Exception $e)
+       {
+       
+           $this->dispatchError($e);
+
+       }
+
+
+
+    }//end fetch message 
+
+
+   /**
+    * Mail Part Parser 
+    * Parses Mail Part 
+    * @param   $mailPartObj 
+    * @return  array
+    **/
+    private function parseMailParts($msgNo,$mailPartObj,$partNo)
+    {
+     
+
+        //echo "<br>-------<br>";
+        //var_export($mailPartObj);
+        //echo "<br>-------<br>";
+        
+         //type 
+        // $mailPartType = $mailPartObj->type;
+        // 
+       
+       
+        //encoding 
+        $encoding = @$mailPartObj->encoding;
+
+        //mailType code 
+        $primaryPartType = $mailPartObj->type;
+
+        $sizeInBytes = @$mailPartObj->byte;
+
+        $disposition = @$mailPartObj->disposition;
+
+        $id = @$mailPartObj->id;
+
+        $subTypeText = strtolower(@$mailPartObj->subtype);
+
+       
+        $mailTypesInfoArray = self::getMailTypes();
+           
+
+        //mail type text  
+        $primaryPartTypeText = strtolower($mailTypesInfoArray[$primaryPartType]);
+
+
+        
+        //message Part data , we will get this if only there is no subparts 
+        $messagePartData= null;
+
+        //subparts 
+        $mailSubPartsArray = [];
+
+        //    
+        if(empty($mailPartObj->parts))
+        {
+       
+            //message part data 
+            $partBodyData = $this->fetchMailBody($msgNo,$encoding,$partNo);
+        
+        }
+
+        else
+        {
+
+            foreach($mailPartObj->parts AS $subPartNo => $mailSubPartObj)
+            {     
+                
+                //php counts from 0 , parts starts from 1
+                $subPartNo = $subPartNo+1;
+
+                $subPartMime = @$mailSubPartObj->subtype;
+
+                $key =  (@$mailSubPartObj -> ifsubtype == 1) ? $subPartMime : $subPartNo;
+                
+
+                $subPartBodyNo = $partNo.".".$subPartNo;
+
+                //lets get the parts info 
+                $mailSubPartsArray[strtolower($key)] = $this->parseMailParts($msgNo,$mailSubPartObj,$subPartBodyNo);
+                
+            }//end loop
+        }
+
+
+         //params 
+        $partParams = [];
+        
+
+        
+        //if parameters 
+        if(@$mailPartObj->ifdparameters == 1)
+        {
+         
+            foreach($mailPartObj->dparameters as $param)
+            {
+                 $partParams[$param->attribute] = $param->value;
+            }
+
+        }//end if param
+        
+
+        //$desposition
+        $desposition = null;
+
+        //if we have desposition 
+        if(@$mailPartObj->ifdisposition == 1)
+        {
+            
+          $desposition = strtolower(@$mailPartObj->disposition);
+
+        }//end desposition
+
+        
+       $mailPartData = [
+
+          "id"                  => $id,
+          "part_no"             => $partNo,
+          "primary_type_no"     => $primaryPartType,
+          "primary_type"        => $primaryPartTypeText,
+          "mime"                => $subTypeText,
+          "encoding"            => $encoding,
+          "disposition"         => $disposition,
+          "params"              => $partParams,
+          "size"                => $sizeInBytes,
+          "body"                => @$partBodyData,
+          "sub_parts"           => $mailSubPartsArray
+       ]; 
+
+      // var_dump($mailPartData);
+
+       return $mailPartData;
+
+    }/***end method **/
+
+
+
+    /**
+     * Proccesses Mail Part
+     *@return  array description
+     * 
+     **/
+    private function fetchMailBody($msgId,$encoding,$partNo=null)
+    {   
+
+         //lets get the part number
+         $data = (!empty($partNo)) ? imap_fetchbody($this->imapConn, $msgId,$partNo) : imap_body($this->imapConn, $msgId);
+
+
+        if($encoding ==  ENC7BIT)
+        {
+             $data = mb_convert_encoding( $data, "UTF-8", "auto");
+        }
+
+        elseif($encoding == ENC8BIT){
+
+            $data = quoted_printable_decode(imap_8bit($data));
+
+        }
+
+        elseif($encoding == ENCBASE64)
+        {
+            $data = imap_base64($data);
+        }
+
+        elseif($encoding == ENCQUOTEDPRINTABLE)
+        {
+            $data = quoted_printable_decode($data);
+        }
+
+
+       //lets return the data 
+       return $data;
+    }//end proccess Mail Part
+
+
+    /**
+     * Fetch Message Headers
+     * @param   $msgNo Message No
+     * @return array of results 
+     * 
+     **/
+    public function messageHeaders($msgNo)
+    {
+         
+        try
+        {
+            
+            //message Headers 
+            $messageHeaders = imap_headerinfo($this->imapConn, $msgNo);
+ 
+            if(empty($messageHeaders) || $messageHeaders==false)
+            {
+                $this->dispatchError("Message Headers fetching failed");
+            }
+        
+        }
+
+        catch(Exception $e)
+        {
+             
+            $this->dispatchError($e);
+
+        }//end catch error 
+
+
+    }///end message headers 
 
     
     /**
