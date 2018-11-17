@@ -12,7 +12,7 @@ using composer , include this in your ***composer.json*** file :
 
 ### Usage 
 
-####Initialise class
+#### Initialize class
 
 ```php
 $imap = new \PHPLibImap\IMAP;
