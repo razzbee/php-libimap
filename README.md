@@ -59,7 +59,7 @@ $imap-> switchMailBox('mailbox_name');
 ```
 the mailbox_name must be one of the names of the mailfolders or boxes in your mailserver , example: INBOX , Drafts , Spam  or Trash 
 
-###Fetch MailBoxes (Mail Folders) 
+### Fetch MailBoxes (Mail Folders) 
 
 You can also list available mail boxes in mailserver 
 
@@ -98,7 +98,7 @@ $mailBoxInfo = $imap->getMailBoxInfo($mailboxName=null,$forceNew=false);
 $totalRecent = $imap->getMailBoxInfo()->recent;
 ```
 
-###Count Total Unread Messages In the MailBox 
+### Count Total Unread Messages In the MailBox 
 
 ```php
 $totalMsgNo = $imap->getTotalMessages();
@@ -128,7 +128,7 @@ $mails = $imap->fetchMailBoxItems("mailbox_name")
 **getResults** : Generate  and get the results 
 
 
-####Fetch Mail Overview using range 
+#### Fetch Mail Overview using range 
 ```php
 $mails = $imap->fetchMailBoxItems("mailbox_name")
               ->range(1,10)
@@ -151,7 +151,7 @@ $mails = $imap->fetchMailBoxItems("mailbox_name")
 ```
 ***limit($limit,$offset=0)*** : The limit method accepts two arguments the limit and offset ,internally , the limits and offsets are been calculated automatically to ranges , this method is safer to use if you have no idea about the range values or number of data in the mailbox. The offset is optional and defaults to 0
 
-####Move Mail Between Mailboxes 
+#### Move Mail Between Mailboxes 
 
 This method moves email message between mailboxes or folder, on success true is returned else false,an exception will also occur on error ..
 
