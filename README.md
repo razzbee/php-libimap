@@ -3,14 +3,14 @@ php-libimap is a PHP imap library in pure OOP, the idea is to make the native ph
 
 
 
-###Installation
+### Installation
 using composer , include this in your ***composer.json*** file :
 
 ```json
 "razzbee/php-libimap" : "dev-master"
 ```
 
-###Usage 
+### Usage 
 
 ####Initialise class
 
@@ -51,7 +51,7 @@ $imap->connectServer([
 
 
 
-###Switching Mailbox 
+### Switching Mailbox 
 After Connecting to the server, the optional mailbox_name  supplied in the connection parameters is opened automatically , you can change or switch mailbox using 
 
 ```php
@@ -81,7 +81,7 @@ read more here : http://php.net/manual/en/function.imap-getmailboxes.php
 
 
 
-###Get Info About a mailbox 
+### Get Info About a mailbox 
 
 ```php
 $mailBoxInfo = $imap->getMailBoxInfo($mailboxName=null,$forceNew=false);
@@ -108,10 +108,10 @@ $totalMsgNo = $imap->getTotalMessages();
 $totalMsgNo = $imap->getMailBoxInfo()->messages;
 ```
 
-###Fetch Mails From a MailBox 
+### Fetch Mails From a MailBox 
 This library has many ways to fetch mails from a mailbox , we have also optimized this particular feature for speed and performance ..
 
-####Fetch MailBox Items overview By UID 
+#### Fetch MailBox Items overview By UID 
 
 ```php
 $mails = $imap->fetchMailBoxItems("mailbox_name")
@@ -141,7 +141,7 @@ $mails = $imap->fetchMailBoxItems("mailbox_name")
 **orderById** : Order the results by the uid , the default is DESC (Descending Order), this means the latest mails overview info will be shown first
 
 
-####Fetch Mail Overview using limit and Offset 
+#### Fetch Mail Overview using limit and Offset 
 Like mysql limit and offset , this library supports the limit and offset using the limit($limit,$offset) method..
 ```php
 $mails = $imap->fetchMailBoxItems("mailbox_name")
@@ -177,7 +177,7 @@ $setFlag = $imap->setFlag($mails_uids_array,$flag,$mailBoxName);
 
 ***$mailBoxName*** : Mailbox name of the mails you want to set the flags to  if not provided , current opened mailbox will be used 
 
-####Search Mail 
+#### Search Mail 
 Search into mailbox using a given criteria , use the getResults() method to retrive the results
 ```php 
         $keyword = "hello";
